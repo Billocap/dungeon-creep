@@ -1,21 +1,36 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <ncurses.h>
+
+#include "lib/view.h"
+
+#define __KEY_CLOSE 27
 
 using namespace std;
 
 int main () {
-  ifstream banner_file ("./misc/banner.txt");
+  bool running = true;
 
-  if (banner_file.is_open()) {
-    string line;
+  int c, w, h;
 
-    while (getline(banner_file, line)) {
-      cout << line << endl;
-    }
+  WINDOW *main = initscr();
+  
+  while (running) {
+    clear();
 
-    banner_file.close();
+    draw_file("misc/banner.txt");
+
+    c = getch();
+
+    getmaxyx(main, h, w);
+
+    running = false;
   }
+
+  endwin();
+
+  cout << endl << w << endl << h;
 
   return 0;
 }
