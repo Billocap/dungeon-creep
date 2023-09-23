@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <vector>
 
+#include "lib/control.h"
 #include "lib/view.h"
 
 #define __KEY_UP 119 // W
@@ -16,15 +17,15 @@ using namespace std;
 int main () {
   bool running = true;
 
-  int c, y;
-
-  int pointer = 0;
+  int c, y, w, h;
 
   WINDOW *main = initscr();
 
   curs_set(0);
 
-  vector<string> menu = {
+  Menu main_menu;
+
+  main_menu.options = {
     "start",
     "continue",
     "close"
@@ -33,9 +34,14 @@ int main () {
   while (running) {
     clear();
 
+    getmaxyx(main, h, w);
+
     y = draw_centered_file(main, "misc/banner", 1);
 
-    y = draw_menu(main, pointer, menu, y + 2);
+    y = draw_menu(main, main_menu.pointer, main_menu.options, y + 2);
+
+    draw_centered_line(main, "Use 'W' asd 'S' to move cursor.", h - 3);
+    draw_centered_line(main, "Use 'Enter' to select.", h - 2);
 
     c = getch();
 
@@ -45,11 +51,11 @@ int main () {
         break;
 
       case __KEY_UP:
-        if (pointer > 0) pointer--;
+        main_menu.pointer_up();
         break;
 
       case __KEY_DOWN:
-        if (pointer < menu.size()) pointer++;
+        main_menu.pointer_down();
         break;
     }
   }
