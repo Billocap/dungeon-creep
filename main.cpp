@@ -4,7 +4,7 @@
 #include <ncurses.h>
 #include <vector>
 
-#include "lib/control.h"
+#include "lib/menus.h"
 #include "lib/view.h"
 
 #define __KEY_UP 119 // W
@@ -15,47 +15,44 @@
 using namespace std;
 
 int main () {
-  bool running = true;
+  Game game;
 
   int c, y, w, h;
 
   WINDOW *main = initscr();
+  MenuManager manager;
 
   curs_set(0);
-
-  Menu main_menu;
-
-  main_menu.options = {
-    "start",
-    "continue",
-    "close"
-  };
   
-  while (running) {
+  while (game.running) {
     clear();
 
     getmaxyx(main, h, w);
 
     y = draw_centered_file(main, "misc/banner", 1);
 
-    y = draw_menu(main, main_menu.pointer, main_menu.options, y + 2);
+    y = draw_menu(main, manager.get_current()->pointer, manager.get_current()->get_labels(), y + 2);
 
-    draw_centered_line(main, "Use 'W' asd 'S' to move cursor.", h - 3);
-    draw_centered_line(main, "Use 'Enter' to select.", h - 2);
+    draw_centered_line(main, "Use 'W' and 'S' to move cursor.", h - 3);
+    draw_centered_line(main, "Press 'Enter' to select.", h - 2);
 
     c = getch();
 
     switch (c) {
       case __KEY_CLOSE:
-        running = false;
+        game.stop();
         break;
 
       case __KEY_UP:
-        main_menu.pointer_up();
+        manager.get_current()->pointer_up();
         break;
 
       case __KEY_DOWN:
-        main_menu.pointer_down();
+        manager.get_current()->pointer_down();
+        break;
+
+      case __KEY_CONFIRM:
+        manager.get_current()->select(&game);
         break;
     }
   }
