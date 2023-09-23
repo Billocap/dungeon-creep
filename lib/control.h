@@ -57,7 +57,9 @@ class Menu {
     }
 
     void pointer_down() {
-      if (this->pointer < this->options.size()) this->pointer++;
+      int size = this->options.size();
+
+      if (this->pointer < size - 1) this->pointer++;
     }
 };
 
