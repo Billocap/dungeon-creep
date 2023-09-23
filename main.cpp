@@ -33,7 +33,7 @@ int main () {
   while (running) {
     clear();
 
-    y = draw_centered_file(main, "misc/banner.txt", 1);
+    y = draw_centered_file(main, "misc/banner", 1);
 
     y = draw_menu(main, pointer, menu, y + 2);
 
