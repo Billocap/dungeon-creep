@@ -1,6 +1,9 @@
 #include <vector>
 #include <string>
 
+#ifndef _CONTROL_H
+#define _CONTROL_H
+
 using namespace std;
 
 class Game {
@@ -16,54 +19,5 @@ class Game {
     }
 };
 
-class Menu;
-class MenuManager;
-
-class MenuOption {
-  public:
-    string label;
-    
-    void (*action)(Game *, Menu *);
-    
-    MenuOption(string label, void (*action)(Game *, Menu *)) {
-      this->label = label;
-      this->action = action;
-    }
-};
-
-class Menu {
-  public:
-    vector<MenuOption> options;
-    int pointer = 0;
-    Menu(MenuManager *manager);
-    MenuManager *manager;
-
-    vector<string> get_labels() {
-      vector<string> labels;
-
-      for (int i = 0; i < this->options.size(); i++) {
-        labels.push_back(this->options[i].label);
-      }
-
-      return labels;
-    }
-
-    void select(Game *game) {
-      this->options[this->pointer].action(game, this);
-    }
-
-    void pointer_up() {
-      if (this->pointer > 0) this->pointer--;
-    }
-
-    void pointer_down() {
-      int size = this->options.size();
-
-      if (this->pointer < size - 1) this->pointer++;
-    }
-};
-
-Menu::Menu(MenuManager *manager) {
-  this->manager = manager;
-}
+#endif
 

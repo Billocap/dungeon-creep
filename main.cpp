@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <vector>
 
+#include "lib/control.h"
 #include "lib/menus.h"
 #include "lib/view.h"
 
