@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "control.h"
+#include "ui.h"
 
 #ifndef _MENUS_H
 #define _MENUS_H
@@ -16,15 +17,20 @@ class MenuOption;
 class Menu;
 class MenuManager;
 
-class MenuOption {
+class MenuOption : public UIInteraction {
   public:
-    string label;
-    
-    void (*action)(Game *, Menu *);
-    
-    MenuOption(string label, void (*action)(Game *, Menu *)) {
-      this->label = label;
+    void (*action)(Game *, MenuOption *);
+    Menu *menu;
+
+    MenuOption(string label, void (*action)(Game *, MenuOption *), Menu *menu) {
+      this->visible = true;
+      this->content = label;
       this->action = action;
+      this->menu = menu;
+    }
+
+    void interact(Game *game) {
+      this->action(game, this);
     }
 };
 
@@ -39,14 +45,20 @@ class Menu {
       vector<string> labels;
 
       for (int i = 0; i < this->options.size(); i++) {
-        labels.push_back(this->options[i].label);
+        labels.push_back(this->options[i].content);
       }
 
       return labels;
     }
 
+    void add_option(string label, void (*action)(Game *, MenuOption *)) {
+      MenuOption option (label, action, this);
+
+      this->options.push_back(option);
+    }
+
     void select(Game *game) {
-      this->options[this->pointer].action(game, this);
+      this->options[this->pointer].interact(game);
     }
 
     void pointer_up() {
@@ -66,60 +78,20 @@ Menu::Menu(MenuManager *manager) {
 
 class MenuManager {
   public:
-    MenuManager();
     Menu* get_current();
+
+    MenuManager();
+
     void go_to(int menu);
+    void add_menu(Menu menu);
     
   private:
-    int current = 0;
-
+    int current;
     vector<Menu> menus;
 };
 
-void does_nothing(Game *game, Menu *menu) {}
-
-void close_game_action(Game *game, Menu *menu) {
-  game->stop();
-}
-
-void go_to_main(Game *game, Menu *menu) {
-  menu->manager->go_to(0);
-}
-
-void go_to_diff(Game *game, Menu *menu) {
-  menu->manager->go_to(1);
-}
-
 MenuManager::MenuManager() {
-  MenuOption new_game ("new game", go_to_diff);
-  MenuOption continue_game ("continue", does_nothing);
-  MenuOption close_game ("close game", close_game_action);
-
-  Menu main_menu (this);
-
-  main_menu.options = {
-    new_game,
-    continue_game,
-    close_game
-  };
-
-  this->menus.push_back(main_menu);
-
-  MenuOption diff_easy ("easy", does_nothing);
-  MenuOption diff_med ("medium", does_nothing);
-  MenuOption diff_hard ("hard", does_nothing);
-  MenuOption back_to_main ("back", go_to_main);
-
-  Menu diff_menu (this);
-
-  diff_menu.options = {
-    diff_easy,
-    diff_med,
-    diff_hard,
-    back_to_main
-  };
-
-  this->menus.push_back(diff_menu);
+  this->current = 0;
 }
 
 Menu* MenuManager::get_current() {
@@ -128,6 +100,10 @@ Menu* MenuManager::get_current() {
 
 void MenuManager::go_to(int menu) {
   this->current = menu;
+}
+
+void MenuManager::add_menu(Menu menu) {
+  this->menus.push_back(menu);
 }
 
 #endif

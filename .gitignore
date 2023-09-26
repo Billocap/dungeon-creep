@@ -1,3 +1,7 @@
 # build files
 bin
 
+# development artifacts
+dev
+*.test*
+

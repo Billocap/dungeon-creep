@@ -15,6 +15,20 @@
 
 using namespace std;
 
+void does_nothing(Game *game, MenuOption *option) {}
+
+void close_game_action(Game *game, MenuOption *option) {
+  game->stop();
+}
+
+void go_to_main(Game *game, MenuOption *option) {
+  option->menu->manager->go_to(0);
+}
+
+void go_to_diff(Game *game, MenuOption *option) {
+  option->menu->manager->go_to(1);
+}
+
 int main () {
   Game game;
 
@@ -23,6 +37,23 @@ int main () {
   WINDOW *main = initscr();
   MenuManager manager;
 
+  Menu main_menu (&manager);
+
+  main_menu.add_option("new game", go_to_diff);
+  main_menu.add_option("continue", does_nothing);
+  main_menu.add_option("close game", close_game_action);
+
+  manager.add_menu(main_menu);
+
+  Menu diff_menu (&manager);
+
+  diff_menu.add_option("easy", does_nothing);
+  diff_menu.add_option("medium", does_nothing);
+  diff_menu.add_option("hard", does_nothing);
+  diff_menu.add_option("back", go_to_main);
+  
+  manager.add_menu(diff_menu);
+  
   curs_set(0);
   
   while (game.running) {
